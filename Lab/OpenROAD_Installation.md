@@ -200,7 +200,7 @@ View the resulting core utilization of 30 created following floorplan:
 
 <img width="1843" height="930" alt="image" src="https://github.com/user-attachments/assets/5f899ab6-c5b0-4394-8f97-19e922c56353" />
 
-# IO Pin Placement
+## IO Pin Placement
 
 Place pins on the boundary of the die on the track grid to minimize net wirelengths. Pin placement also creates a metal shape for each pin using min-area rules.
 
@@ -234,7 +234,7 @@ write_def $def_file
 
 diff_file place_pin4.defok $def_file
 ```
-From the FUI Tcl commands section:
+From the GUI Tcl commands section:
 ```bash
 source place_pin4.tcl
 ```
@@ -242,3 +242,42 @@ View the resulting pin placement in GUI:
 <img width="1848" height="916" alt="image" src="https://github.com/user-attachments/assets/a53d5554-3135-49be-84a0-fe79b54708fc" />
 <img width="1284" height="588" alt="image" src="https://github.com/user-attachments/assets/fc536e37-6be8-46f2-98c3-f10277fd59fb" />
 
+# Macro or Standard Cell Placement
+
+## Macro Placement
+
+In this section, you will explore various placement options for macros and standard cells and study the impact on area and timing.
+
+Refer to the following built-in example here to learn about macro placement.
+
+```bash
+source helpers.tcl
+set test_name macro01
+read_lef ./nangate45.lef
+read_lef ./bp_be_top_macro.lef
+read_def ./$test_name.def
+
+global_placement -density 0.7
+set def_file [make_result_file $test_name.def]
+write_def $def_file
+diff_file $def_file $test_name.defok
+source report_hpwl.tcl
+```
+Placement density impacts how widely standard cells are placed in the core area. To view this in OpenROAD GUI run the following command(s) in the terminal in OpenROAD tool root directory:
+
+```bash
+cd ../tools/OpenROAD/src/gpl/test/
+openroad -gui
+```
+<img width="869" height="894" alt="image" src="https://github.com/user-attachments/assets/b395a425-500c-4a12-a777-72b41d93e34e" />
+
+In the Tcl Commands section of GUI
+
+```
+source macro01.tcl
+```
+Read the resulting macro placement with a complete core view:
+
+<img width="1849" height="917" alt="image" src="https://github.com/user-attachments/assets/847762c9-1884-4f4e-9b6b-9cbf1eda1b98" />
+
+<img width="999" height="681" alt="image" src="https://github.com/user-attachments/assets/f4e0b5bf-21a4-446c-b5da-4bda18916d36" />
