@@ -122,3 +122,123 @@ Inside the `flow/` Directory
 ```
 <img width="736" height="212" alt="image" src="https://github.com/user-attachments/assets/87fc885a-bed0-42c6-a3c5-16f816febe98" />
 
+# Floorplanning
+
+This section describes OpenROAD-flow-scripts floorplanning and placement functions using the GUI
+
+## Floorplan Initialization Based On Core And Die Area
+
+Refer to the following OpenROAD built-in examples
+
+```bash
+# init_floorplan
+source "helpers.tcl"
+read_lef Nangate45/Nangate45.lef
+read_liberty Nangate45/Nangate45_typ.lib
+read_verilog reg1.v
+link_design top
+initialize_floorplan -die_area "0 0 1000 1000" \
+  -core_area "100 100 900 900" \
+  -site FreePDK45_38x28_10R_NP_162NW_34O
+
+set def_file [make_result_file init_floorplan1.def]
+write_def $def_file
+diff_files init_floorplan1.defok $def_file
+```
+Run the following commands in the terminal in OpenROAD tool root directory to build and view the created floorplan.
+
+```bash
+cd ../tools/OpenROAD/src/ifp/test/
+openroad -gui
+```
+<img width="737" height="481" alt="image" src="https://github.com/user-attachments/assets/2439da58-ba40-4a21-891a-a764d162043b" />
+
+<img width="1498" height="666" alt="image" src="https://github.com/user-attachments/assets/dd97157b-3285-4f72-966f-f787fb1a989e" />
+
+
+In Tcl Commands section GUI:
+```bash
+source init_floorplan1.tcl
+```
+View the resulting die area “0 0 1000 1000” and core area “100 100 900 900” in microns shown below:
+<img width="1849" height="923" alt="image" src="https://github.com/user-attachments/assets/4dfbc7cf-8d50-4c56-b1e4-c5ccdc0c3453" />
+
+## Floorplan Based On Core Utilization
+
+Refer to the following OpenROAD built-in examples
+
+```bash
+# init_floorplan -core_space < site height
+source "helpers.tcl"
+read_lef Nangate45/Nangate45.lef
+read_liberty Nangate45/Nangate45_typ.lib
+read_verilog reg1.v
+link_design top
+initialize_floorplan -utilization 30 \
+  -aspect_ratio 0.5 \
+  -core_space 1 \
+  -site FreePDK45_38x28_10R_NP_162NW_34O
+
+set def_file [make_result_file init_floorplan2.def]
+write_def $def_file
+diff_files init_floorplan2.defok $def_file
+```
+
+Run the following commands in the terminal in OpenROAD tool root directory to view how the floorplan initialized:
+
+```bash
+cd ../tools/OpenROAD/src/ifp/test/
+openroad -gui
+```
+
+In the Tcl Commands section of the GUI:
+```bash
+source init_floorplan2.tcl
+```
+
+View the resulting core utilization of 30 created following floorplan:
+
+<img width="1843" height="930" alt="image" src="https://github.com/user-attachments/assets/5f899ab6-c5b0-4394-8f97-19e922c56353" />
+
+# IO Pin Placement
+
+Place pins on the boundary of the die on the track grid to minimize net wirelengths. Pin placement also creates a metal shape for each pin using min-area rules.
+
+For designs with unplaced cells, the net wirelength is computed considering the center of the die area as the unplaced cells position.
+
+Launch openroad GUI by running the following command(s) in the terminal in OpenROAD tool root directory:
+```bash
+cd ../tools/OpenROAD/src/ppl/test/
+openroad -gui
+```
+<img width="1444" height="899" alt="image" src="https://github.com/user-attachments/assets/2d415616-cbb2-4fee-b84c-4c754166184e" />
+
+Run place_pin4.tcl script to view pin placement.
+
+```place_pin4.tcl
+# gcd_nangate45 IO placement
+source "helpers.tcl"
+read_lef Nangate45/Nangate45.lef
+read_def gcd.def
+
+place_pin -pin_name clk -layer metal7 -location {40 30} -pin_size {1.6 2.5} -force_to_die_boundary
+place_pin -pin_name resp_val -layer metal4 -location {12 50} -pin_size {2 2} -force_to_die_boundary
+place_pin -pin_name req_msg[0] -layer metal10 -location {25 70} \
+  -pin_size {4 4} -force_to_die_boundary
+
+place_pins -hor_layers metal3 -ver_layers metal2 -corner_avoidance 0 -min_distance 0.12
+
+set def_file [make_result_file place_pin4.def]
+
+write_def $def_file
+
+diff_file place_pin4.defok $def_file
+```
+From the FUI Tcl commands section:
+```bash
+source place_pin4.tcl
+```
+View the resulting pin placement in GUI:
+<img width="1848" height="916" alt="image" src="https://github.com/user-attachments/assets/a53d5554-3135-49be-84a0-fe79b54708fc" />
+<img width="1284" height="588" alt="image" src="https://github.com/user-attachments/assets/fc536e37-6be8-46f2-98c3-f10277fd59fb" />
+
